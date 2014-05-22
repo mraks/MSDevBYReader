@@ -10,7 +10,8 @@
 
 @interface DetailPostsViewController : UIViewController
 
-@property(nonatomic, strong)NSString * text;
-@property(nonatomic, strong)UIImage * image;
+- (id)initWithUrl:(NSString*)url;
+- (void) startLoadContentByUrl:(NSString*)url;
+- (BOOL)isArticleWithData;
 
 @end

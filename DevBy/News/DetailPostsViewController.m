@@ -9,14 +9,59 @@
 #import "DetailPostsViewController.h"
 #import "CommentsViewController.h"
 #import "Constants.h"
+#import "HTMLParser.h"
 
-@interface DetailPostsViewController ()
-
+@interface DetailPostsViewController () <HTMLParserDelegate>
+{
+    NSString* articleCellurl;
+    HTMLParser* parse;
+    BOOL isArticleWithData;
+}
 @property(nonatomic, assign)float totalHeight;
+
+@property(nonatomic, strong)NSString * text;
+@property(nonatomic, strong)UIImage * image;
 
 @end
 
 @implementation DetailPostsViewController
+
+- (id)initWithUrl:(NSString*)url
+{
+    self = [super init];
+    if (self) {
+        [self startLoadContentByUrl:url];
+    }
+    return self;
+}
+
+- (void) startLoadContentByUrl:(NSString*)url
+{
+    if(url)
+    {
+        articleCellurl = url;
+        parse = [HTMLParser sharedInstance];
+        [parse startParseFromUrl:articleCellurl andXPath:NEWS_CELL_XPATH];
+        parse.delegate = self;
+        isArticleWithData = YES;
+    } else
+    {
+        isArticleWithData = NO;
+    }
+}
+
+- (BOOL)isArticleWithData
+{
+    return isArticleWithData;
+}
+
+-(void)parseData:(NSDictionary *)dataDictionary WithUrl:(NSString *)url andXPath:(NSString *)xpath
+{
+    if([articleCellurl isEqualToString:url] && [xpath isEqualToString:NEWS_CELL_XPATH])
+    {
+//        NSLog(@"%@",dataDictionary);
+    }
+}
 
 -(NSString *)text
 {
@@ -25,6 +70,13 @@
         _text = @"The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 loper struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 struggling with status bars The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 loper struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 struggling with status bars The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 loper struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 struggling with status bars The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 loper struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 struggling with status bars The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 loper struggling with status bars and view controller containment on iOS 7. The API documentation is woefully inadequate as of this writing. The following is, to the best of my knowledge, essential information for any developer struggling with status bars and view controller containment on iOS 7 struggling with status bars uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue uurhfjjhkjf uehrgiuhseriugh ieurhgiurehiguhseriugh sdiurghiuershgiuesrhgi esirhfiuerhguhesrigs iseuruhgiersguhserighesri iuerhgiuserhsguihesruighiseurhgiusdrh isuerhgiuserhguheriughiseruhgiuserghseuirghsiue врамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщ врамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщврамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщврамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщврамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщврамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщврамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщврамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщврамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщврамиловатмотывлоамтова вгармолывтлопткколптоык вгаптшгыватовытпаоптлоыва гвккопщшукоыпшщоыщшопщшвк пшвыкоыпщшыуокшщпощышукпо ыщпощыукопщыуощкопуышщ ыкопшщыукопшщыукошщпоыукшщо щшукоопщыушкопщшкоп куопщшуыкопщшыуопщшквыпоыущ ыущшкопщшыкоушыщпоыщукшпощукш щщушкопщшыкопщуыкшщопуыозпшщукоз щкуыопщыщпрзыущкшпо ыущзкпрзщуыкопщзыоущшкопщзыушкопщ";
     }
     return _text;
+}
+
+-(UIImage *)image
+{
+    if(!_image)
+        _image = [UIImage imageNamed:@"devImage3"];
+    return _image;
 }
 
 - (void)viewDidLoad
@@ -110,6 +162,16 @@
 {
     CommentsViewController * commentsViewController = [[CommentsViewController alloc] init];
     [self.navigationController pushViewController:commentsViewController animated:YES];
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [super viewWillDisappear:animated];
+    
+    if (![[self.navigationController viewControllers] containsObject:self])
+    {
+        [parse finishParse];
+    }
 }
 
 @end

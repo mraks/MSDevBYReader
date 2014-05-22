@@ -15,28 +15,75 @@
 #import "Constants.h"
 
 #import "SlideViewController.h"
+#import "HTMLParser.h"
+#import "NewsParse.h"
+#import "NewsElement.h"
 
 
-@interface PostsViewController () <SlideViewDelegate>
+@interface PostsViewController () <SlideViewDelegate, HTMLParserDelegate>
 {
     NSMutableArray * _posts;
     float mainCellHeight;
-    float articleCellHeight;
+    NSMutableArray* cellsArray;
+    NSMutableDictionary* cellsDictionary;
+    NSString* urlToLoad;
 }
 
 @end
 
 @implementation PostsViewController
 
+- (id)init
+{
+    self = [super init];
+    if (self)
+    {
+        [self startLoadAndParseContentByUrl:NEWS_URL];
+    }
+    return self;
+}
+
+- (void) startLoadAndParseContentByUrl:(NSString*)url
+{
+    urlToLoad = url;
+    HTMLParser* parse = [HTMLParser sharedInstance];
+    [parse startParseFromUrl:url andXPath:NEWS_XPATH];
+    parse.delegate = self;
+}
+
+-(void)parseData:(NSDictionary *)dataDictionary WithUrl:(NSString *)url andXPath:(NSString *)xpath
+{
+    if([url isEqualToString:urlToLoad] && [xpath isEqualToString:NEWS_XPATH])
+    {
+        NewsParse *parser = [[NewsParse alloc]init];
+        [self fillCellArrayWithDataArray:[parser getDataFromDictionary:dataDictionary]];
+    }
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    cellsArray = [NSMutableArray array];
+    cellsDictionary = [NSMutableDictionary dictionary];
     mainCellHeight = self.view.bounds.size.height*0.4 - halfOffset/2;
-    articleCellHeight = (self.view.bounds.size.height - mainCellHeight - navBarHeight)/3 + 7;
-    self.navigationItem.titleView = [[UIImageView alloc] initWithImage:[self imageWithImage:[UIImage imageNamed:@"devLogo"] scaledToSize:CGSizeMake(100, 35)]];
-    _posts = [[NSMutableArray alloc] initWithArray:@[@"Full-stack разработчики: Программисты, понимающие весь стек, обычно создают более качественные приложения.", @"Heartbleed – новое слово в маркетинге багов.", @"Злой гений создал гибрид '2048' и 'Flappy Bird' на погибель вашей продуктивности.", @"Сегодня в 18:00 начнется прямая трансляция церемонии награждения Belarusian IT Awards и Best IT Companies."]];
-    
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Новости" style:UIBarButtonItemStylePlain target:nil action:nil];
+}
+
+- (void)fillCellArrayWithDataArray:(NSArray*)dataArray
+{
+    [dataArray enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+        
+        if(![obj isKindOfClass:NewsElement.class])
+            return ;
+        
+        NewsElement* element = (NewsElement*)obj;
+        
+        if(idx == 0)
+            [cellsArray addObject:[self createMainCellWithElement:element]];
+        else
+            [cellsArray addObject:[self createArticleCellWithElement:element]];
+    }];
+
+    [self.tableView reloadData];
 }
 
 - (UIImage *)imageWithImage:(UIImage *)image scaledToSize:(CGSize)newSize
@@ -48,6 +95,28 @@
     return newImage;
 }
 
+- (MainArticleCell*) createMainCellWithElement:(NewsElement*)element
+{
+    MainArticleCell * cell = [[MainArticleCell alloc] init];
+    cell.title = element.title;
+    cell.imageUrl = element.image;
+    cell.articleUrl = element.url;
+    cell.height = mainCellHeight;
+    [cell drawCell];
+    return cell;
+}
+
+- (ArticleCell*)createArticleCellWithElement:(NewsElement*)element
+{
+    ArticleCell * cell = [[ArticleCell alloc] init];
+    cell.title = element.title;
+    cell.date = element.time;
+    cell.imageUrl = element.image;
+    cell.articleUrl = element.url;
+    [cell drawCell];
+    return cell;
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -57,7 +126,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return [_posts count];
+    return [cellsArray count];
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -68,73 +137,39 @@
     }
     else
     {
-        return articleCellHeight;
+        return ((ArticleCell*) [cellsArray objectAtIndex:indexPath.row]).height;
     }
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    static NSString *CellIdentifier = @"Cell";
-    UITableViewCell *cell;
-    if (indexPath.row == 0)
+    return [cellsArray objectAtIndex:indexPath.row];
+}
+
+-(NSString *)urlOfCurrentArticle:(int)index
+{
+    NSString* url;
+    if(index == 0)
     {
-        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil)
-        {
-            cell = [[MainArticleCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-            MainArticleCell * articleCell = (MainArticleCell *)cell;
-            articleCell.title = _posts[indexPath.row];
-            articleCell.image = [UIImage imageNamed:@"devImage"];
-            articleCell.height = mainCellHeight;
-            [articleCell drawCell];
-        }
-    }
-    
-    else
+        url = ((MainArticleCell*)[cellsArray objectAtIndex:index]).articleUrl;
+        
+    }else
     {
-        cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil)
-        {
-            cell = [[ArticleCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-            ArticleCell * articleCell = (ArticleCell *)cell;
-            articleCell.title = _posts[indexPath.row];
-            articleCell.date = @"25 апреля в 08:26";
-            articleCell.image = [UIImage imageNamed:@"devImage3"];
-            articleCell.height = articleCellHeight;
-            [articleCell drawCell];
-        }
+        url = ((ArticleCell*)[cellsArray objectAtIndex:index]).articleUrl;
     }
-    
-    return cell;
+    return url;
 }
 
 -(NSInteger)countForPages
 {
-    return [_posts count];
+    return [cellsArray count];
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    
-    SlideViewController* slideViewController = [[SlideViewController alloc]initWithIndex:indexPath.row];
+    SlideViewController* slideViewController = [[SlideViewController alloc]initWithPageIndex:indexPath.row];
     slideViewController.delegate = self;
     [self.navigationController pushViewController:slideViewController animated:YES];
-    
-    
-//    DetailPostsViewController * detailViewController = [[DetailPostsViewController alloc] init];
-//    detailViewController.title = _posts[indexPath.row];
-//    UITableViewCell * cell = [tableView cellForRowAtIndexPath:indexPath];
-//    if (indexPath == 0)
-//    {
-//        MainArticleCell * articleCell = (MainArticleCell *)cell;
-//        detailViewController.image = articleCell.image;
-//    }
-//    else
-//    {
-//        ArticleCell * articleCell = (ArticleCell *)cell;
-//        detailViewController.image = articleCell.image;
-//    }
-//    [self.navigationController pushViewController:detailViewController animated:YES];
 }
 
 @end

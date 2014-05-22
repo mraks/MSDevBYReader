@@ -12,6 +12,28 @@
 #define JOB @"Вакансии"
 #define EVENTS @"События"
 
+#define NEWS_URL @"http://dev.by"
+#define NEWS_XPATH @"//div[@class='lists-blogs']"
+#define NEWS_CELL_XPATH @"//div[@class='blog-views-node item-body']"
+#define NEWS_CELL_COMENTS_XPATH @"//div[@class='comments-list list-more']"
+
+
+#define COMPANYS_URL @"http://companies.dev.by"
+#define JOB_URL @"http://jobs.dev.by"
+#define EVENTS_URL @"http://events.dev.by"
+
+#define MOVE_RIGHT @"moveRight"
+#define MOVE_LEFT @"moveLeft"
+
+enum
+{
+    newsCells,
+    posts,
+    companies,
+    vacancies,
+    events
+};
+
 enum
 {
     redColor,

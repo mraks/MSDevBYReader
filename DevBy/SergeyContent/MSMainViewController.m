@@ -13,14 +13,26 @@
 #import "VacanciesViewController.h"
 #import "Constants.h"
 
+#import "HTMLParser.h"
+
+
 @interface MSMainViewController () <MenuDelegate>
+{
+    HTMLParser* parser;
+}
 @property(nonatomic, strong) MSSlideSystemController *viewController;
+
 @end
+
 @implementation MSMainViewController
+
 @synthesize viewController;
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    parser = [[HTMLParser alloc]init];
     
     //put chosen viewController
     [self initNewCategory:NEWS];
@@ -46,7 +58,8 @@
         viewController.centralPanel = [[UINavigationController alloc] initWithRootViewController: [[EventsViewController alloc] init]];
     }
     [self.navigationController pushViewController:viewController animated:YES];
-    ((UINavigationController*) viewController.centralPanel).topViewController.navigationItem.titleView = [[UIImageView alloc] initWithImage:[self imageWithImage:[UIImage imageNamed:@"devLogo"] scaledToSize:CGSizeMake(100, 35)]];
+
+    ((UINavigationController*) viewController.centralPanel).topViewController.navigationItem.title = type;
 }
 
 - (void) showChosenCategory:(NSString*) chosenViewController
@@ -57,6 +70,9 @@
 - (void)showChosenCategory:(NSString *)chosenViewController withFlag:(BOOL)flag
 {
     UINavigationController* navigation = ((UINavigationController*) viewController.centralPanel);
+    
+    [parser finishParse];
+    
     if(flag)
     {
         if ([viewController.centralPanel isKindOfClass:UINavigationController.class])
@@ -100,6 +116,7 @@
         {
             return;
         }
+        
         [self initNewCategory:chosenViewController];
     }
 }

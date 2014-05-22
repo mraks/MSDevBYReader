@@ -12,8 +12,9 @@
 
 @property(nonatomic, strong)NSString * title;
 @property(nonatomic, strong)NSString * date;
-@property(nonatomic, strong)UIImage * image;
+@property(nonatomic, strong)NSString * imageUrl;
 @property(nonatomic, assign)float height;
+@property(nonatomic, strong)NSString* articleUrl;
 
 -(void)drawCell;
 

@@ -12,29 +12,28 @@
 #import "ArticleCell.h"
 
 #import "DetailPostsViewController.h"
+#import "HTMLParser.h"
 
 @interface SlideViewController () <UIPageViewControllerDelegate, UIPageViewControllerDataSource>
 
 @property(nonatomic, strong) UIPageViewController* pageViewController;
-@property(nonatomic,strong) NSArray* contentArray; 
 
 @end
 
 @implementation SlideViewController
 {
     NSInteger currentIndex;
-    NSMutableArray * array;
+    NSMutableArray * contentArray;
 }
 
 @synthesize delegate;
 @synthesize pageViewController;
-@synthesize contentArray;
 
-- (id)initWithIndex:(NSInteger)index
+
+- (id)initWithPageIndex:(int)index
 {
     self = [super init];
-    if (self) 
-    {
+    if (self) {
         currentIndex = index;
     }
     return self;
@@ -44,12 +43,16 @@
 {
     [super viewDidLoad];
 
-    array = [[NSMutableArray alloc] init];
-    [self fillArrayWith:@"Full-stack разработчики: Программисты, понимающие весь стек, обычно создают более качественные приложения." andImage:[UIImage imageNamed:@"devImage"]];
-    [self fillArrayWith:@"Heartbleed – новое слово в маркетинге багов." andImage:[UIImage imageNamed:@"devImage3"]];
-    [self fillArrayWith:@"Злой гений создал гибрид '2048' и 'Flappy Bird' на погибель вашей продуктивности." andImage:[UIImage imageNamed:@"devImage3"]];
-    [self fillArrayWith:@"Сегодня в 18:00 начнется прямая трансляция церемонии награждения Belarusian IT Awards и Best IT Companies." andImage:[UIImage imageNamed:@"devImage3"]];
+    contentArray = [[NSMutableArray alloc] init];
     
+    int count = [delegate countForPages];
+    for(int i = 0; i < count; i++)
+    {
+        DetailPostsViewController * detail = [[DetailPostsViewController alloc]initWithUrl:nil];
+        [detail.view setBackgroundColor:[UIColor whiteColor]];
+        [contentArray addObject:detail];
+    }
+
     [self addArticleNumber: currentIndex + 1];
 
     pageViewController = [[UIPageViewController alloc]initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:[NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:50.0] forKey:UIPageViewControllerOptionSpineLocationKey]];
@@ -59,9 +62,17 @@
 
     pageViewController.view.frame = CGRectMake(0, self.navigationController.navigationBar.frame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height, self.view.frame.size.width, self.view.frame.size.height - self.navigationController.navigationBar.frame.size.height - [UIApplication sharedApplication].statusBarFrame.size.height);
 
-    DetailPostsViewController * detailViewController1 = array[currentIndex];
+    DetailPostsViewController * detailViewController = [contentArray objectAtIndex:currentIndex];
     
-    NSArray* viewControllersArray = @[detailViewController1];
+    if(!detailViewController.isArticleWithData)
+    {
+        [detailViewController startLoadContentByUrl:[delegate urlOfCurrentArticle:currentIndex]];
+    }
+    
+    [contentArray replaceObjectAtIndex:currentIndex withObject:detailViewController];
+    
+    NSArray* viewControllersArray = @[detailViewController];
+    
     [pageViewController setViewControllers:viewControllersArray direction:UIPageViewControllerNavigationDirectionForward animated:YES completion:nil];
     
     [self addChildViewController:pageViewController];
@@ -69,15 +80,6 @@
     [pageViewController didMoveToParentViewController:self];
     
     self.view.gestureRecognizers = pageViewController.gestureRecognizers;
-}
-
--(void)fillArrayWith:(NSString *)title andImage:(UIImage *)image
-{
-    DetailPostsViewController * detail = [[DetailPostsViewController alloc] init];
-    detail.title = title;
-    detail.image = image;
-    detail.view.backgroundColor = [UIColor whiteColor];
-    [array addObject:detail];
 }
 
 -(void)addArticleNumber:(int)number
@@ -105,8 +107,11 @@
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerBeforeViewController:(UIViewController *)viewController
 {
-    DetailPostsViewController * controller = (DetailPostsViewController *)viewController;
-    int index = [array indexOfObject:controller];
+    HTMLParser* parser = [HTMLParser sharedInstance];
+    [parser finishParse];
+    
+    DetailPostsViewController* controller = (DetailPostsViewController *)viewController;
+    int index = [contentArray indexOfObject:controller];
     
     if(index == 0)
     {
@@ -114,28 +119,36 @@
     }
     index--;
     
-    DetailPostsViewController * detailViewController = array[index];
+    DetailPostsViewController * detailViewController = contentArray[index];
     return detailViewController;
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController viewControllerAfterViewController:(UIViewController *)viewController
 {
+    HTMLParser* parser = [HTMLParser sharedInstance];
+    [parser finishParse];
+    
     DetailPostsViewController * controller = (DetailPostsViewController *)viewController;
-    int index = [array indexOfObject:controller];
+    int index = [contentArray indexOfObject:controller];
     
     if (index == [delegate countForPages] - 1)
     {
         return nil;
     }
     index++;
-    DetailPostsViewController * detailViewController = array[index];
+    
+    DetailPostsViewController* detailViewController = [contentArray objectAtIndex:index];
     return detailViewController;
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers
 {
     DetailPostsViewController * controller = (DetailPostsViewController *)pendingViewControllers[0];
-    int index = [array indexOfObject:controller] + 1;
+    if(!controller.isArticleWithData)
+    {
+        [controller startLoadContentByUrl:[delegate urlOfCurrentArticle:currentIndex]];
+    }
+    int index = [contentArray indexOfObject:controller] + 1;
     [self addArticleNumber: index];
 }
 
